@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "createmv"
+version = "0.1.0"
+description = "曲の簡易的なMV作成ソフト"
+authors = ["midry"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.23.3"
+opencv-python = "^4.6.0.66"
+pydub = "^0.25.1"
+wxPython = "^4.2.0"
+moviepy = "^1.0.3"
+
+
+[tool.poetry.group.dev.dependencies]
+nuitka = "^1.1.3"
+zstandard = "^0.18.0"
+ordered-set = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
