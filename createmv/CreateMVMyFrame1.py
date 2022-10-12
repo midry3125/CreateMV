@@ -5,12 +5,15 @@ import subprocess
 import tempfile
 
 import cv2
-import moviepy.editor as mp
 import numpy as np
 import wx
 import App
 
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 from pydub import AudioSegment
+
+os.chdir(tempfile.gettempdir())
 
 
 WIDTH = 800
@@ -79,21 +82,6 @@ class CreateMVMyFrame1( App.MyFrame1 ):
         # TODO: Implement m_button10OnButtonClick
         dlg = wx.ProgressDialog(title="CMV", message="読み込み中...", style=wx.PD_APP_MODAL | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
         dlg.Show()
-        save_path = self.m_textCtrl16.GetValue()
-        if not save_path:
-            self.m_staticText13.SetLabel("保存先が指定されていません")
-            dlg.Close()
-            self.Refresh()
-            return
-        if os.path.isdir(save_path):
-            save_filename = os.path.join(save_path, "video.mp4")
-        else:
-            if not os.path.isdir(os.path.dirname(save_path)):
-                os.makedirs(os.path.dirname(save_path))
-            if not save_path.endswith(".mp4"):
-                save_filename = save_path.rstrip(".") + ".mp4"
-            else:
-                save_filename = save_path
         audio_file = self.m_textCtrl14.GetValue()
         if not os.path.isfile(audio_file):
             self.m_staticText13.SetLabel("音声ファイルが指定されていないかファイルが\n存在しません")
@@ -109,6 +97,21 @@ class CreateMVMyFrame1( App.MyFrame1 ):
             dlg.Close()
             self.Refresh()
             return
+        save_path = self.m_textCtrl16.GetValue()
+        if not save_path:
+            self.m_staticText13.SetLabel("保存先が指定されていません")
+            dlg.Close()
+            self.Refresh()
+            return
+        if os.path.isdir(save_path):
+            save_filename = os.path.join(save_path, os.path.splitext(os.path.basename(audio_file))[0] + ".mp4")
+        else:
+            if not os.path.isdir(os.path.dirname(save_path)):
+                os.makedirs(os.path.dirname(save_path))
+            if not save_path.endswith(".mp4"):
+                save_filename = save_path.rstrip(".") + ".mp4"
+            else:
+                save_filename = save_path
         image_file = self.m_textCtrl15.GetValue()
         try:
             img = cv2.resize(cv2.imread(image_file), (WIDTH, HEIGHT))
@@ -138,8 +141,8 @@ class CreateMVMyFrame1( App.MyFrame1 ):
                 dlg.Update(99 if 100 <= progress else progress, newmsg=f"オーディオスペクトラムを作成中...  {n}/{length}")
             video.release()
             dlg.Update(99, newmsg=f"音声を結合中...")
-            clip = mp.VideoFileClip(temp_video)
-            mv = clip.set_audio(mp.AudioFileClip(audio_file))
+            clip = VideoFileClip(temp_video)
+            mv = clip.set_audio(AudioFileClip(audio_file))
             mv.write_videofile(save_filename)
         dlg.Update(100, newmsg=f"処理が完了しました")
             
