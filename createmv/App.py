@@ -17,13 +17,13 @@ import wx.xrc
 class MyFrame1 ( wx.Frame ):
 
     def __init__( self, parent ):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "CMV", pos = wx.DefaultPosition, size = wx.Size( 800, 500 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "CMV", pos = wx.DefaultPosition, size = wx.Size( 800, 500 ), style = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX | wx.TAB_TRAVERSAL )
 
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
 
-        self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.Size(700, 500), wx.TAB_TRAVERSAL )
+        self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, self.Size, wx.TAB_TRAVERSAL )
         bSizer8 = wx.BoxSizer( wx.HORIZONTAL )
 
         self.m_panel2 = wx.Panel( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size(250, 500), wx.TAB_TRAVERSAL )

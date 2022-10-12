@@ -87,13 +87,13 @@ class CreateMVMyFrame1( App.MyFrame1 ):
             return
         if os.path.isdir(save_path):
             save_filename = os.path.join(save_path, "video.mp4")
-        elif not os.path.isdir(os.path.dirname(save_path)):
-            os.makedirs(os.path.dirname(save_path))
-            save_filename = save_path
-        elif not save_path.rstrip(".mp4"):
-            save_filename = save_path + ".mp4"
         else:
-            save_filename = save_path
+            if not os.path.isdir(os.path.dirname(save_path)):
+                os.makedirs(os.path.dirname(save_path))
+            if not save_path.endswith(".mp4"):
+                save_filename = save_path.rstrip(".") + ".mp4"
+            else:
+                save_filename = save_path
         audio_file = self.m_textCtrl14.GetValue()
         if not os.path.isfile(audio_file):
             self.m_staticText13.SetLabel("音声ファイルが指定されていないかファイルが\n存在しません")
@@ -120,7 +120,6 @@ class CreateMVMyFrame1( App.MyFrame1 ):
         draw = self.shapes[self.m_choice2.GetSelection()]
         color = self.colors[self.m_choice3.GetSelection()]
         fourcc = cv2.VideoWriter_fourcc("m", "p", "4", "v")
-        print(save_filename)
         with tempfile.TemporaryDirectory() as temp:
             temp_video = os.path.join(temp, ".mp4")
             video = cv2.VideoWriter(temp_video, fourcc, FPS, (WIDTH, HEIGHT))
@@ -159,7 +158,7 @@ class CreateMVMyFrame1( App.MyFrame1 ):
 
 def draw_horizon(i, v, img, s, c, preview=False):
     h = 450 if preview else HEIGHT
-    cv2.rectangle(img, (int(part_w * i + 1), h), (int(part_w * (i + 1) - 1), int(max(h - v/(1 if preview else 8), 0))), c, thickness=-1)
+    cv2.rectangle(img, (int(part_w * i + 1), h), (int(part_w * (i + 1) - 1), int(max(h - v/(1 if preview else 8), 0))), c, thickness=-5)
 
 def draw_circle(i, v, img, s, c, preview=False):
     w = 600 if preview else WIDTH
