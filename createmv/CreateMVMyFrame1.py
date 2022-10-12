@@ -166,7 +166,6 @@ def draw_circle(i, v, img, s, c, preview=False):
     rad = (2 * np.pi) * (i / len(s))
     x1 = int(w / 2 + np.sin(rad) * 80)
     y1 = int(h / 2 - np.cos(rad) * 80)
-    rad = (2 * np.pi) * (i / len(s))
     x2 = int(w / 2 + np.sin(rad) * (80 + v/16))
     y2 = int(h / 2 - np.cos(rad) * (80 + v/16))
     cv2.line(img, (x1, y1), (x2, y2), c, thickness=2)
