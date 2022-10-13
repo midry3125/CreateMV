@@ -24,7 +24,7 @@ FRAME_SIZE = 2048
 SAMPLING_SIZE = FRAME_SIZE * 4
 INT16_MAX = 32767
 
-preview_data = [23.97877689, 6.85166079, 0.0, 0.0, 7.74882264, 0.0, 0.0, 9.77712341, 0.0, 20.93901343, 0.0, 33.45155314, 29.2166891, 0.0, 9.52927197, 11.16447276, 19.95186728, 0.0, 14.15247974, 18.98400545, 19.80741083, 49.46484202, 6.85965645, 12.70949027, 4.00079555, 12.15805654, 20.20038415, 13.70362379, 32.43606186, 30.16001426, 58.84907029, 45.15902352, 28.94616422, 50.62166162, 103.4423617, 200.58170151, 209.43992705, 267.33022312, 76.84569139, 60.68818881, 74.12634801, 128.76411455, 42.16144102, 35.71657766, 52.19179011, 23.2780897, 26.23851274, 29.75537854, 38.60292573, 28.12012731, 42.14545554, 36.32095902, 53.45524617, 36.86722298, 31.47895737, 72.50372511, 100.38679199, 40.98758931, 74.43735078, 65.5357791, 58.66018862, 106.40858241, 113.95347814, 103.46142682, 89.91234329, 150.69379353, 136.26565617, 170.44672991, 189.39906453, 249.12484728, 276.01626992, 242.96915763, 324.41724943, 285.57455461, 379.27829873, 416.02735037, 526.86589897, 648.80578632, 730.0380328, 846.29444645, 842.31018416, 889.29242904, 1335.26024003, 1405.62453582, 1460.25159463, 1524.69427391, 1731.44561156, 1927.27107693, 2226.31246776, 2137.92277822, 2040.65799756, 2143.53545926, 2090.95210328, 2251.60565529, 1852.38596794, 1929.41548201, 1802.70399699, 1607.27375332, 1437.16933874, 1169.71338282]
+preview_data = [208.93320214897923, 111.87468812584916, 0.0, 0.0, 141.79913989362706, 0.0, 0.0, 172.51773040353802, 0.0, 202.07527079245563, 0.0, 228.45497022168178, 249.74519854154664, 0.0, 264.296917757219, 270.85686426280137, 268.6699005107386, 0.0, 257.5482369230068, 237.91035896748986, 210.8021302801421, 321.7449405865618, 106.49551159806714, 79.04183317689527, 70.89378972959423, 191.83214385722223, 276.3588700835531, 157.5324027144556, 304.7764892732505, 280.0348884621842, 119.45034525553439, 167.90321184220994, 323.2078735832823, 275.97601394972486, 281.7571045484443, 376.3893228427966, 172.27522087289435, 336.0518375323326, 368.29843211808554, 296.1844387123827, 283.36389689375386, 335.18250276684864, 352.52080811797987, 395.2311769588005, 332.56862703633533, 326.3518720009661, 353.3927108563122, 199.1631010941759, 213.62206408295395, 310.1209382766217, 310.3951480248984, 398.5869615937684, 312.296603106399, 361.43133512491914, 319.2285615508598, 361.82886211521884, 306.1923617333016, 382.8543769392828, 348.97075736198593, 389.9409655580049, 354.26383982749064, 342.4513416170773, 349.6279529175187, 365.16789311586757, 338.78190400803885, 297.8917554795074, 329.3776542034391, 331.1487544648564, 154.5264551810376, 123.95108732403608, 61.701525692720004, 61.24687917769049, 63.706750544235284, 66.02103466886973, 69.74300526696166, 74.17618640321732]
 spectram_range = [int(22050 / 2 ** (i/10)) for i in range(100, -1,-1)]
 freq = np.abs(np.fft.fftfreq(SAMPLING_SIZE, d=(1/SAMPLE_RATE)))
 spectram_array = (freq <= spectram_range[0]).reshape(1,-1)
@@ -32,7 +32,6 @@ for index in range(1, len(spectram_range)):
     tmp_freq = ((freq > spectram_range[index - 1]) & (freq <= spectram_range[index])).reshape(1,-1)
     spectram_array = np.append(spectram_array, tmp_freq, axis=0)
 part_w = WIDTH / len(spectram_range)
-part_h = HEIGHT / 100
 
 
 # Implementing MyFrame1
@@ -78,6 +77,19 @@ class CreateMVMyFrame1( App.MyFrame1 ):
         except:
             self.m_textCtrl4.SetValue(str(self.m_slider1.GetValue() / 100))
 
+    def m_slider2OnSlider( self, event ):
+        n = self.m_slider2.GetValue()
+        self.m_textCtrl5.SetValue(str(n / 100))
+        self.show_preview(event)
+
+    def m_textCtrl5OnText( self, event ):
+        n = self.m_textCtrl5.GetValue()
+        try:
+            self.m_slider2.SetValue(int(float(n) * 100))
+            self.show_preview(event)
+        except:
+            self.m_textCtrl5.SetValue(str(self.m_slider2.GetValue() / 100))
+
     def m_button10OnButtonClick( self, event ):
         # TODO: Implement m_button10OnButtonClick
         dlg = wx.ProgressDialog(title="CMV", message="読み込み中...", style=wx.PD_APP_MODAL | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
@@ -118,6 +130,8 @@ class CreateMVMyFrame1( App.MyFrame1 ):
         except:
             img = np.full((HEIGHT, WIDTH, 3), 0, dtype=np.uint8)
         beta = self.m_slider1.GetValue()
+        alpha = self.m_slider2.GetValue() / 100
+        beta_spectram = 1 - alpha
         image = cv2.convertScaleAbs(img, beta=beta)
         self.m_staticText13.SetLabel("")
         draw = self.shapes[self.m_choice2.GetSelection()]
@@ -133,10 +147,10 @@ class CreateMVMyFrame1( App.MyFrame1 ):
                 if sampling_data.shape[0] > SAMPLING_SIZE:
                     sampling_data = sampling_data[-SAMPLING_SIZE:]
                 fft = np.abs(np.fft.fft(sampling_data))
-                spectram_data = np.dot(spectram_array, fft)
+                spectram_data = np.clip(np.dot(spectram_array, fft), None, 3000.0)
                 for index, value in enumerate(spectram_data):
                     draw(index, value, draw_image, spectram_data, color)
-                video.write(draw_image)
+                video.write(cv2.addWeighted(draw_image, alpha, image, beta_spectram, 0))
                 progress = round(n / length * 100)
                 dlg.Update(99 if 100 <= progress else progress, newmsg=f"オーディオスペクトラムを作成中...  {n}/{length}")
             video.release()
@@ -152,10 +166,13 @@ class CreateMVMyFrame1( App.MyFrame1 ):
             draw = self.shapes[self.m_choice2.GetSelection()]
             color = self.colors[self.m_choice3.GetSelection()]
             beta = self.m_slider1.GetValue()
+            alpha = self.m_slider2.GetValue() / 100
             image = cv2.convertScaleAbs(cv2.imread(path), beta=beta)
+            draw_image = image.copy()
             for i, v in enumerate(preview_data):
-                draw(i, v, image, preview_data, color, preview=True)
-            buf = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                draw(i, v, draw_image, preview_data, color, preview=True)
+            preview = cv2.addWeighted(draw_image, alpha, image, 1 - alpha, 0)
+            buf = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
             bmp = wx.Bitmap.FromBuffer(image.shape[1], image.shape[0], buf)
             self.m_bitmap2.SetBitmap(bmp)
 

@@ -118,6 +118,21 @@ class MyFrame1 ( wx.Frame ):
         self.m_textCtrl4 = wx.TextCtrl( self.m_panel2, wx.ID_ANY, "0.0", wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer5.Add( self.m_textCtrl4, 0, wx.ALL, 5 )
 
+
+        self.m_staticText82 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"オーディオスペクトラムの透明度", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText82.Wrap( -1 )
+
+        gSizer5.Add( self.m_staticText82, 0, wx.ALL, 5 )
+
+
+        gSizer5.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+        self.m_slider2 = wx.Slider( self.m_panel2, wx.ID_ANY, 100, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
+        gSizer5.Add( self.m_slider2, 0, wx.ALL, 5 )
+
+        self.m_textCtrl5 = wx.TextCtrl( self.m_panel2, wx.ID_ANY, "1.0", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gSizer5.Add( self.m_textCtrl5, 0, wx.ALL, 5 )
+
         self.m_staticText13 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText13.SetForegroundColour("#FF0000")
         self.m_staticText13.Wrap( -1 )
@@ -170,6 +185,8 @@ class MyFrame1 ( wx.Frame ):
         self.m_textCtrl15.Bind( wx.EVT_TEXT, self.show_preview )
         self.m_slider1.Bind( wx.EVT_SLIDER, self.m_slider1OnSlider )
         self.m_textCtrl4.Bind( wx.EVT_TEXT, self.m_textCtrl4OnText )
+        self.m_slider2.Bind( wx.EVT_SLIDER, self.m_slider2OnSlider )
+        self.m_textCtrl5.Bind( wx.EVT_TEXT, self.m_textCtrl5OnText )
 
     def __del__( self ):
         pass
@@ -195,4 +212,10 @@ class MyFrame1 ( wx.Frame ):
         event.Skip()
 
     def m_textCtrl4OnText( self, event ):
+        event.Skip()
+
+    def m_slider2OnSlider( self, event ):
+        event.Skip()
+
+    def m_textCtrl5OnText( self, event ):
         event.Skip()
