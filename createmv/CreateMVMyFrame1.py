@@ -11,6 +11,7 @@ import App
 
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from moviepy.audio.io.AudioFileClip import AudioFileClip
+from proglog import ProgressBarLogger
 from pydub import AudioSegment
 
 os.chdir(tempfile.gettempdir())
@@ -33,6 +34,24 @@ for index in range(1, len(spectram_range)):
     spectram_array = np.append(spectram_array, tmp_freq, axis=0)
 part_w = WIDTH / len(spectram_range)
 
+
+class WriteVideoProgress(ProgressBarLogger):
+    def __init__(self, progress, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.progress = progress
+        self.reading_audio = False
+    
+    def callback(self, *_, **__):
+        pass
+
+    def bars_callback(self, bar, attr, value, old_value=None):
+        total = self.bars[bar]["total"]
+        p = int(value / total * 100)
+        if old_value is None:
+            self.reading_audio = not self.reading_audio
+            self.msg = "音声の読み込み中...  {}/{}" if self.reading_audio else "動画の書き出し中...  {}/{}"
+        self.progress.Update(99 if 100 <= p else p, newmsg=self.msg.format(value, total))
+        
 
 # Implementing MyFrame1
 class CreateMVMyFrame1( App.MyFrame1 ):
@@ -92,8 +111,8 @@ class CreateMVMyFrame1( App.MyFrame1 ):
 
     def m_button10OnButtonClick( self, event ):
         # TODO: Implement m_button10OnButtonClick
-        dlg = wx.ProgressDialog(title="CMV", message="読み込み中...", style=wx.PD_APP_MODAL | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
-        dlg.Show()
+        dlg1 = wx.ProgressDialog(title="CMV", message="読み込み中...", style=wx.PD_APP_MODAL | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
+        dlg1.Show()
         audio_file = self.m_textCtrl14.GetValue()
         if not os.path.isfile(audio_file):
             self.m_staticText13.SetLabel("音声ファイルが指定されていないかファイルが\n存在しません")
@@ -147,18 +166,20 @@ class CreateMVMyFrame1( App.MyFrame1 ):
                 if sampling_data.shape[0] > SAMPLING_SIZE:
                     sampling_data = sampling_data[-SAMPLING_SIZE:]
                 fft = np.abs(np.fft.fft(sampling_data))
-                spectram_data = np.clip(np.dot(spectram_array, fft), None, 3000.0)
+                spectram_data = np.dot(spectram_array, fft)
                 for index, value in enumerate(spectram_data):
                     draw(index, value, draw_image, spectram_data, color)
                 video.write(cv2.addWeighted(draw_image, alpha, image, beta_spectram, 0))
-                progress = round(n / length * 100)
-                dlg.Update(99 if 100 <= progress else progress, newmsg=f"オーディオスペクトラムを作成中...  {n}/{length}")
+                progress = int(n / length * 100)
+                dlg1.Update(99 if 100 <= progress else progress, newmsg=f"オーディオスペクトラムを作成中...  {n}/{length}")
             video.release()
-            dlg.Update(99, newmsg=f"音声を結合中...")
+            dlg1.Close()
+            dlg2 = wx.ProgressDialog(title="CMV", message="読み込み中...", style=wx.PD_APP_MODAL | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
+            dlg2.Show()
             clip = VideoFileClip(temp_video)
             mv = clip.set_audio(AudioFileClip(audio_file))
-            mv.write_videofile(save_filename)
-        dlg.Update(100, newmsg=f"処理が完了しました")
+            mv.write_videofile(save_filename, verbose=False, logger=WriteVideoProgress(dlg2))
+            dlg2.Update(100, newmsg="処理が完了しました")
             
     def show_preview( self, event ):
         path = self.m_textCtrl15.GetValue()
