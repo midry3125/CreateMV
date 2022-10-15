@@ -19,6 +19,8 @@ os.chdir(tempfile.gettempdir())
 
 WIDTH = 800
 HEIGHT = 600
+PREVIEW_WIDTH = 600
+PREVIEW_HEIGHT = 450
 FPS = 60
 SAMPLE_RATE = 44100
 FRAME_SIZE = 2048  
@@ -33,6 +35,7 @@ for index in range(1, len(spectram_range)):
     tmp_freq = ((freq > spectram_range[index - 1]) & (freq <= spectram_range[index])).reshape(1,-1)
     spectram_array = np.append(spectram_array, tmp_freq, axis=0)
 part_w = WIDTH / len(spectram_range)
+preview_part_w = PREVIEW_WIDTH / len(spectram_range)
 
 
 class WriteVideoProgress(ProgressBarLogger):
@@ -198,12 +201,14 @@ class CreateMVMyFrame1( App.MyFrame1 ):
             self.m_bitmap2.SetBitmap(bmp)
 
 def draw_horizon(i, v, img, s, c, preview=False):
-    h = 450 if preview else HEIGHT
-    cv2.rectangle(img, (int(part_w * i + 1), h), (int(part_w * (i + 1) - 1), int(max(h - v/(1 if preview else 8), 0))), c, thickness=-5)
+    w = PREVIEW_WIDTH if preview else WIDTH
+    h = PREVIEW_HEIGHT if preview else HEIGHT
+    part = preview_part_w if preview else part_w
+    cv2.rectangle(img, (int(part * i + 1), h), (int(part * (i + 1) - 1), int(max(h - v/(1 if preview else 16), 0))), c, thickness=-5)
 
 def draw_circle(i, v, img, s, c, preview=False):
-    w = 600 if preview else WIDTH
-    h = 450 if preview else HEIGHT
+    w = PREVIEW_WIDTH if preview else WIDTH
+    h = PREVIEW_HEIGHT if preview else HEIGHT
     rad = (2 * np.pi) * (i / len(s))
     x1 = int(w / 2 + np.sin(rad) * 80)
     y1 = int(h / 2 - np.cos(rad) * 80)
