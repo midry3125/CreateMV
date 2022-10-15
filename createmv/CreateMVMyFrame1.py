@@ -11,7 +11,7 @@ import App
 
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from moviepy.audio.io.AudioFileClip import AudioFileClip
-from proglog import ProgressBarLogger
+from moviepy.video.VideoClip import proglog
 from pydub import AudioSegment
 
 os.chdir(tempfile.gettempdir())
@@ -38,7 +38,7 @@ part_w = WIDTH / len(spectram_range)
 preview_part_w = PREVIEW_WIDTH / len(spectram_range)
 
 
-class WriteVideoProgress(ProgressBarLogger):
+class WriteVideoProgress(proglog.ProgressBarLogger):
     def __init__(self, progress, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.progress = progress
