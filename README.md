@@ -38,3 +38,6 @@ $ cd CreateMV
 $ poetry install # or: pip install --user .
 $ poetry run nuitka --mingw64 --follow-imports --enable-plugin=numpy --onefile -o CreateMV.exe ./createmv/main.py # pipを使用してインストールした場合、先頭のpoetry runは不要です
 ```
+
+# ライセンス
+[MITライセンス](LICENSE)
