@@ -40,4 +40,4 @@ $ poetry run nuitka --mingw64 --follow-imports --enable-plugin=numpy --onefile -
 ```
 
 # ライセンス
-[MITライセンス](LICENSE)
+[MITライセンス](LICENSE)です
