@@ -39,5 +39,8 @@ $ poetry install # or: pip install --user .
 $ poetry run nuitka --mingw64 --follow-imports --enable-plugin=numpy --onefile --windows-disable-console -o CreateMV.exe ./createmv/main.py # pipを使用してインストールした場合、先頭のpoetry runは不要です
 ```
 
+# 変更点
+[CHANGELOG](CHANGELOG.md)を参照してください
+
 # ライセンス
 [MITライセンス](LICENSE)です
