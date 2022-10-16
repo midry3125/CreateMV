@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "createmv"
-version = "0.1.0"
+version = "0.1.1"
 description = "曲の簡易的なMV作成ソフト"
 authors = ["midry"]
 license = "MIT"
