@@ -26,6 +26,8 @@ SAMPLE_RATE = 44100
 FRAME_SIZE = 2048  
 SAMPLING_SIZE = FRAME_SIZE * 4
 INT16_MAX = 32767
+DEFAULT_IMAGE = np.full((HEIGHT, WIDTH, 3), 0, dtype=np.uint8)
+DEFAULT_PREVIEW_IMAGE = np.full((PREVIEW_HEIGHT, PREVIEW_WIDTH, 3), 0, dtype=np.uint8)
 
 preview_data = [208.93320214897923, 111.87468812584916, 0.0, 0.0, 141.79913989362706, 0.0, 0.0, 172.51773040353802, 0.0, 202.07527079245563, 0.0, 228.45497022168178, 249.74519854154664, 0.0, 264.296917757219, 270.85686426280137, 268.6699005107386, 0.0, 257.5482369230068, 237.91035896748986, 210.8021302801421, 321.7449405865618, 106.49551159806714, 79.04183317689527, 70.89378972959423, 191.83214385722223, 276.3588700835531, 157.5324027144556, 304.7764892732505, 280.0348884621842, 119.45034525553439, 167.90321184220994, 323.2078735832823, 275.97601394972486, 281.7571045484443, 376.3893228427966, 172.27522087289435, 336.0518375323326, 368.29843211808554, 296.1844387123827, 283.36389689375386, 335.18250276684864, 352.52080811797987, 395.2311769588005, 332.56862703633533, 326.3518720009661, 353.3927108563122, 199.1631010941759, 213.62206408295395, 310.1209382766217, 310.3951480248984, 398.5869615937684, 312.296603106399, 361.43133512491914, 319.2285615508598, 361.82886211521884, 306.1923617333016, 382.8543769392828, 348.97075736198593, 389.9409655580049, 354.26383982749064, 342.4513416170773, 349.6279529175187, 365.16789311586757, 338.78190400803885, 297.8917554795074, 329.3776542034391, 331.1487544648564, 154.5264551810376, 123.95108732403608, 61.701525692720004, 61.24687917769049, 63.706750544235284, 66.02103466886973, 69.74300526696166, 74.17618640321732]
 spectram_range = [int(22050 / 2 ** (i/10)) for i in range(100, -1,-1)]
@@ -66,6 +68,7 @@ class CreateMVMyFrame1( App.MyFrame1 ):
             subprocess.run("ffmpeg", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except:
             wx.MessageBox("ffmpegがインストールされていない、またはPathが通っていないため\nmp3など一部形式に対応していません", "警告", wx.ICON_EXCLAMATION)
+        self.show_preview(None)
 
     # Handlers for MyFrame1 events.
     def m_button11OnButtonClick( self, event ):
@@ -150,7 +153,7 @@ class CreateMVMyFrame1( App.MyFrame1 ):
         try:
             img = cv2.resize(cv2.imread(image_file), (WIDTH, HEIGHT))
         except:
-            img = np.full((HEIGHT, WIDTH, 3), 0, dtype=np.uint8)
+            img = DEFAULT_IMAGE
         beta = self.m_slider1.GetValue()
         alpha = self.m_slider2.GetValue() / 100
         beta_spectram = 1 - alpha
@@ -186,19 +189,18 @@ class CreateMVMyFrame1( App.MyFrame1 ):
             
     def show_preview( self, event ):
         path = self.m_textCtrl15.GetValue()
-        if os.path.isfile(path):
-            draw = self.shapes[self.m_choice2.GetSelection()]
-            color = self.colors[self.m_choice3.GetSelection()]
-            beta = self.m_slider1.GetValue()
-            alpha = self.m_slider2.GetValue() / 100
-            image = cv2.convertScaleAbs(cv2.imread(path), beta=beta)
-            draw_image = image.copy()
-            for i, v in enumerate(preview_data):
-                draw(i, v, draw_image, preview_data, color, preview=True)
-            preview = cv2.addWeighted(draw_image, alpha, image, 1 - alpha, 0)
-            buf = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
-            bmp = wx.Bitmap.FromBuffer(image.shape[1], image.shape[0], buf)
-            self.m_bitmap2.SetBitmap(bmp)
+        draw = self.shapes[self.m_choice2.GetSelection()]
+        color = self.colors[self.m_choice3.GetSelection()]
+        beta = self.m_slider1.GetValue()
+        alpha = self.m_slider2.GetValue() / 100
+        image = cv2.convertScaleAbs(cv2.imread(path) if os.path.isfile(path) else DEFAULT_PREVIEW_IMAGE, beta=beta)
+        draw_image = image.copy()
+        for i, v in enumerate(preview_data):
+            draw(i, v, draw_image, preview_data, color, preview=True)
+        preview = cv2.addWeighted(draw_image, alpha, image, 1 - alpha, 0)
+        buf = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+        bmp = wx.Bitmap.FromBuffer(image.shape[1], image.shape[0], buf)
+        self.m_bitmap2.SetBitmap(bmp)
 
 def draw_horizon(i, v, img, s, c, preview=False):
     w = PREVIEW_WIDTH if preview else WIDTH
